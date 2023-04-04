@@ -3,6 +3,7 @@
 namespace App\DataWrappers;
 
 use App\Models\Product;
+use Exception;
 
 class Cart
 {
@@ -10,6 +11,9 @@ class Cart
 
     public function add(Product $product,  float $quantity, array $meta = []): void
     {
+        if($product->quanity < $quantity)
+            throw new Exception('Not enough product quantity');
+            
         if (isset($this->products[$product->id])) {
             $product[$product->id]['quantity'] += $quantity;
             array_merge($product[$product->id]['meta'], $meta);
