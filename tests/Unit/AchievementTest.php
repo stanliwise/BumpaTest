@@ -20,6 +20,4 @@ class AchievementTest extends TestCase
     public function test_second_achievement(){
 
     }
-
-    public function test_third_ac
 }

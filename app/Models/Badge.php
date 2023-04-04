@@ -14,6 +14,11 @@ class Badge extends Model
         return static::where('parent_id', $this->id)->first();
     }
 
+    /**
+     * 
+     * 
+     * @return Badge
+     */
     public function previous_badge()
     {
         return static::where('id', $this->parent_id)->first();

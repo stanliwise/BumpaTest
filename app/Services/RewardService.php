@@ -3,44 +3,33 @@
 namespace App\Services;
 
 use App\DataWrappers\Cart;
+use App\Events\AchievementUnlocked;
+use App\Models\Achievement;
 use App\Models\Product;
 use App\Models\User;
 
 class RewardService
 {
-        protected $achievables = [
-            '1 Purchase' => 1,
-            '5 Purchase' => 5,
-            '10 Purchase' => 10,
-            '20 Purchase' => 20,
-            '30 Purchase' => 30,
-            '45 Purchase' => 45,
-            '60 Purchase' => 60,
-            '80 Purchase' => 80,
-        ];
-
-    protected $badges = [
-        'Beginner' => 5,
-        'Intermediate' => 20,
-        'Advanced' => 40,
-        'Super Customer' => 60,
-        'Legend Customer' => 80,
-    ];
 
     public function __construct()
     {
     }
 
-    public function awardAchievements(User $user)
+    /**
+     * This service provider is responsible process all archievement a user 
+     * 
+     * @param User $user that should be considered to be awarded
+     */
+    public function processAchievements(User $user)
     {
-        $purchase_count = $user->purchase()->count();
+        $user_purchase_count = $user->achievements();
+        $achieveables  = Achievement::get(['purchase_count', 'id']);
 
-        foreach ($this->achievables as $key => $amount) {
-            if ($amount == $purchase_count) {
-                $user->achievements()->create([
-                    'name' => $key
-                ]);
+        foreach ($achieveables as $achieveable) {
+            if ($achieveable->purchase_count == $user_purchase_count) {
+                $user->achievements()->syncWithoutDetaching($achieveable->id);
 
+                AchievementUnlocked::dispatch($user, $achieveable);
                 break;
             }
         }
@@ -49,9 +38,7 @@ class RewardService
     /**
      * Get Users next Badge
      */
-    public function nextBagdge(User $user)
+    public function processBadge(User $user)
     {
-        $collection = collect($this->achievables);
-        $collection->next();
     }
 }

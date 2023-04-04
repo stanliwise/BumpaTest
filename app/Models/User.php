@@ -57,11 +57,40 @@ class User extends Authenticatable
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function badges(){
+    public function badges()
+    {
         return $this->belongsToMany(Badge::class)->withTimestamps();
     }
 
-    public function current_badge(){
+    /**
+     * Current badge owned by the User
+     * 
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function current_badge()
+    {
         return $this->badges()->orderByPivot('created_at', 'desc')->limit(1);
+    }
+
+    /**
+     * All next available achievement a user could attain
+     * 
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function next_available_achievements()
+    {
+        return  Achievement::where(
+            'purchase_count',
+            '>',
+            $this->current_achievement()->value('purchase_count') ?: 0
+        )->orderBy('id', 'asc');
+    }
+
+    /**
+     * Next Badge to be earned by a user
+     */
+    public function next_badge()
+    {
+        return $this->badges()->count() == 0 ? Badge::first() : $this->current_badge()->first()->next_badge();
     }
 }
