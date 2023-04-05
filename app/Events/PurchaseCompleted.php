@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\User;
+use App\Models\Invoice;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,29 +11,23 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PurchaseCompleted implements Queue
+class PurchaseCompleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var int
+     * @var Invoice
      */
-    public $amount;
-
-    /**
-     * @var User
-     */
-    public $user;
+    public $invoice;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(int $amount, User $user)
+    public function __construct($invoice)
     {
-        $this->amount = $amount;
-        $this->user = $user;
+        $this->invoice = $invoice;
     }
 
     /**

@@ -52,6 +52,15 @@ class User extends Authenticatable
         return $this->achievements()->orderByPivot('created_at', 'desc')->limit(1);
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function invoicesItem(){
+        return $this->hasManyThrough(InvoiceItem::class, Invoice::class);
+    }
+
     /**
      * Badges earned by a user
      * 

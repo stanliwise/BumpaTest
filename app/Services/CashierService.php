@@ -80,6 +80,15 @@ class CashierService
 
     protected function processInvoice(Invoice $invoice)
     {
+        if ($invoice->status == 'paid')
+            return;
+
+        #deduct user
+        $user = $invoice->user;
+
+        $user->forceFill(['amount' => $invoice->grand_total])->save();
+        $invoice->update(['status' => 'paid']);
+        $invoice->refresh();
     }
 
     public function process(Cart $cart, User $user)
@@ -90,6 +99,8 @@ class CashierService
         if ($user->amount < $total_bill)
             throw new Exception('Insufficient Balance to buy cart product');
 
+        #TODO: this code should use a lock while generating invoice to mark out product
+
         /**
          * @var Invoice
          */
@@ -99,6 +110,6 @@ class CashierService
 
         PurchaseCompleted::dispatch($invoice);
 
-        return true;
+        return $invoice;
     }
 }

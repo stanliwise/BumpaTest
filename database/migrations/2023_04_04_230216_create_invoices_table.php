@@ -19,6 +19,7 @@ class CreateInvoicesTable extends Migration
             $table->string('grand_total');
             $table->string('comment')->nullable();
             $table->foreignId('user_id');
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

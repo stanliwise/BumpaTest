@@ -51,9 +51,10 @@ class Cart
 
     public function eagerLoadProducts()
     {
-        $this->eagerLoadedProducts = $this->eagerLoadedProducts ?: Product::whereIn('id', [
-            collect($this->products)->keys()->toArray()
-        ])->get();
+        $this->eagerLoadedProducts = $this->eagerLoadedProducts ?: Product::whereIn(
+            'id',
+            collect($this->products)->keys()->values()
+        )->get();
 
         return $this->eagerLoadedProducts;
     }

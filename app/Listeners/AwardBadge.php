@@ -6,7 +6,7 @@ use App\Events\PurchaseCompleted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class AwardBadge
+class AwardBadge implements ShouldQueue
 {
     /**
      * Create the event listener.

@@ -56,6 +56,7 @@ class CashierServiceTest extends TestCase
 
     public function test_generate_invoice()
     {
+        /**@var User */
         $user = User::factory()->create();
 
         $cart = new Cart;
@@ -80,11 +81,32 @@ class CashierServiceTest extends TestCase
         ]);
 
         #assert I have an invoice
-        #$this->assert
+        $this->assertEquals(1, $user->invoices()->count());
 
         #asserting I have some invoice item
         $this->assertDatabaseHas('invoice_items', [
             'total_amount' => 800
         ]);
+    }
+
+    public function test_process_invoice()
+    {
+        $user = User::factory()->create();
+        $user->amount = 15500;
+        $user->save();
+
+        $cart = new Cart();
+
+        $cart->add($Product1 = Product::factory()->create([
+            'price' => 400,
+            'quantity' => 4
+        ]), 3);
+
+        $cart->add($Product2 = Product::factory()->create([
+            'price' => 200,
+            'quantity' => 4
+        ]), 3);
+
+        $this->cashierService->process($cart, $user);
     }
 }
