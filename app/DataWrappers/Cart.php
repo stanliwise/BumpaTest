@@ -9,11 +9,13 @@ class Cart
 {
     protected $products = [];
 
+    protected $eagerLoadedProducts = [];
+
     public function add(Product $product,  float $quantity, array $meta = []): void
     {
-        if($product->quanity < $quantity)
+        if ($product->quantity < $quantity)
             throw new Exception('Not enough product quantity');
-            
+
         if (isset($this->products[$product->id])) {
             $product[$product->id]['quantity'] += $quantity;
             array_merge($product[$product->id]['meta'], $meta);
@@ -25,7 +27,12 @@ class Cart
         }
     }
 
-    protected function remove(Product $product, float $quantity, array $meta = []): bool
+    public function getProductQuantity(int $product_id)
+    {
+        return isset($this->products[$product_id]) ? $this->products[$product_id]['quantity'] : 0;
+    }
+
+    public function remove(Product $product, float $quantity, array $meta = []): bool
     {
         if (!isset($this->products[$product->id]))
             return false;
@@ -40,6 +47,15 @@ class Cart
     public function empty(): void
     {
         $this->products = [];
+    }
+
+    public function eagerLoadProducts()
+    {
+        $this->eagerLoadedProducts = $this->eagerLoadedProducts ?: Product::whereIn('id', [
+            collect($this->products)->keys()->toArray()
+        ])->get();
+
+        return $this->eagerLoadedProducts;
     }
 
     public function getproducts(): array

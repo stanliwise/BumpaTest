@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,6 +18,9 @@ class DatabaseSeeder extends Seeder
             AchievementSeeder::class,
             BadgeSeeder::class
         ]);
+
+
+        Product::factory(10)->create();
         // \App\Models\User::factory(10)->create();
     }
 }

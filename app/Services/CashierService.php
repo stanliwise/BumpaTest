@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\DataWrappers\Cart;
 use App\Events\PurchaseCompleted;
+use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\User;
+use Exception;
 
 class CashierService
 {
@@ -26,25 +28,74 @@ class CashierService
 
     /**
      * 
+     * Collate price in a basket
+     * 
+     * @return float
      */
-    protected function collate_price(Cart $cart)
+    protected function collate_price(Cart $cart): float
     {
+        $total_amount = 0;
         $product_ids = collect($cart->getproducts());
 
-        $products = Product::whereIn('id', [$product_ids])->get();
+        if ($product_ids->isEmpty())
+            return $total_amount;
 
-        foreach ($cart->getproducts() as $product) {
+        //eager load the products
+        $products = $cart->eagerLoadProducts();
+
+        foreach ($products as $product) {
+            $total_amount += $product->price * $product_ids[$product->id]['quantity'];
         }
+
+        return $total_amount;
+    }
+
+    protected function generateInvoice(User $user, Cart $cart, float $price, $comment = ''): Invoice
+    {
+        /**
+         * @var Invoice
+         */
+        $invoice = Invoice::create([
+            'total_amount' => $price,
+            'grand_total' => $price,
+            'comment' => '',
+            'user_id' => $user->id
+        ]);
+
+        foreach ($cart->eagerLoadProducts() as $product) {
+            $invoice->items()->create([
+                'product_id' => $product->id,
+                'per_item_price' => $product->price,
+                'total_amount' => $product->price * $cart->getProductQuantity($product->id),
+                'quantity' => $cart->getProductQuantity($product->id),
+            ]);
+
+            $product->forceFill([
+                'quantity' => $product->quantity - $cart->getProductQuantity($product->id)
+            ])->save();
+        }
+
+        return $invoice;
+    }
+
+    protected function processInvoice(Invoice $invoice)
+    {
     }
 
     public function process(Cart $cart, User $user)
     {
         //pipeline
-        $this->validate_purchase($cart);
-        $price = $this->collate_price($cart);
-        $invoice = $this->InvoiceService->generate($cart, $price);
-        $this->walletService->debit($user, $invoice->amount());
-        #$this->InvoiceService->generate_receipt($invoice);
+        $total_bill = $this->collate_price($cart);
+
+        if ($user->amount < $total_bill)
+            throw new Exception('Insufficient Balance to buy cart product');
+
+        /**
+         * @var Invoice
+         */
+        $invoice = $this->generateInvoice($user, $cart, $total_bill);
+
+        $this->processInvoice($invoice);
 
         PurchaseCompleted::dispatch($invoice);
 
