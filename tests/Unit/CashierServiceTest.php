@@ -108,5 +108,9 @@ class CashierServiceTest extends TestCase
         ]), 3);
 
         $this->cashierService->process($cart, $user);
+
+        $user->refresh();
+
+        $this->assertEquals(13700, $user->amount);
     }
 }

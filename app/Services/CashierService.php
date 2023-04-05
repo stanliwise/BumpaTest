@@ -87,7 +87,7 @@ class CashierService
 
         $balance_before = $user->amount;
 
-        $user->forceFill(['amount' => $invoice->grand_total])->save();
+        $user->forceFill(['amount' => $user->amount - $invoice->grand_total])->save();
         $invoice->update(['status' => 'paid']);
         $invoice->refresh();
 
