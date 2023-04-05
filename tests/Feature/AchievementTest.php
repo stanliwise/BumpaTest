@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\DataWrappers\Cart;
 use App\Models\Achievement;
 use App\Models\Badge;
+use App\Models\Product;
 use App\Models\User;
+use App\Services\CashierService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -24,9 +27,20 @@ class AchievementTest extends TestCase
      *
      * @return void
      */
-    public function achievement_route_return_valid_structure()
+    public function test_achievement_route_return_valid_structure()
     {
-        $user = User::factory()->create();
+        /**@var User */
+        $user = User::factory()->create([
+            'amount' => 15000
+        ]);
+
+        $cart = new Cart();
+
+        $cart->add(Product::first(), 6);
+
+        $cashier = new CashierService();
+
+        $cashier->process($cart, $user);
 
         $this
             ->get(route('achievement.info', ['user' => $user->id ]))
@@ -37,12 +51,12 @@ class AchievementTest extends TestCase
                 'current_badge',
                 'next_badge',
                 'remaining_to_unlock_next_badge'
-            ]);
+            ])->dump();
 
 
     }
 
-    public function test_achievement_route_show_valid_info_about_user_with_a_badge(){
+    public function achievement_route_show_valid_info_about_user_with_a_badge(){
         $user = User::factory()->create();
 
         $user->achievements()->syncWithoutDetaching(Achievement::first());

@@ -12,10 +12,7 @@ use Exception;
 
 class CashierService
 {
-    protected $walletService;
-    protected $receiptService;
-
-    public function __construct($walletService, $receiptService)
+    public function __construct()
     {
     }
 

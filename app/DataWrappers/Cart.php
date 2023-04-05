@@ -11,7 +11,7 @@ class Cart
 
     protected $eagerLoadedProducts = [];
 
-    public function add(Product $product,  float $quantity, array $meta = []): void
+    public function add(Product $product,  float $quantity = 1, array $meta = []): void
     {
         if ($product->quantity < $quantity)
             throw new Exception('Not enough product quantity');

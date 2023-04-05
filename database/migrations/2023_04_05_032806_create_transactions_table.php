@@ -19,6 +19,7 @@ class CreateTransactionsTable extends Migration
             $table->float('amount');
             $table->string('user_id');
             $table->string('type');
+            $table->string('comment')->nullable();
             $table->float('balance_before');
             $table->float('balance_after');
             $table->timestamps();
