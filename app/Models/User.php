@@ -97,8 +97,10 @@ class User extends Authenticatable
 
     /**
      * Next Badge to be earned by a user
+     * 
+     * @return Badge
      */
-    public function next_badge()
+    public function next_badge(): Badge
     {
         return $this->badges()->count() == 0 ? Badge::first() : $this->current_badge()->first()->next_badge();
     }

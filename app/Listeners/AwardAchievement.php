@@ -11,6 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class AwardAchievement implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Create the event listener.
      *
@@ -18,13 +20,11 @@ class AwardAchievement implements ShouldQueue
      */
     public function __construct()
     {
-        //
     }
 
     /**
      * Handle the event.
      *
-     * @param  PurchaseCompleted  $event
      * @return void
      */
     public function handle(PurchaseCompleted $event)
@@ -43,8 +43,7 @@ class AwardAchievement implements ShouldQueue
 
         foreach ($achieved as $an_achievement) {
             $user->achievements()->syncWithoutDetaching($an_achievement);
-
-            AchievementUnlocked::dispatch($an_achievement);
+            AchievementUnlocked::dispatch($an_achievement->name, $user);
         }
     }
 }

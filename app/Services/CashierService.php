@@ -6,6 +6,7 @@ use App\DataWrappers\Cart;
 use App\Events\PurchaseCompleted;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Models\User;
 use Exception;
 
@@ -84,11 +85,24 @@ class CashierService
             return;
 
         #deduct user
+        /**@var User */
         $user = $invoice->user;
+
+        $balance_before = $user->amount;
 
         $user->forceFill(['amount' => $invoice->grand_total])->save();
         $invoice->update(['status' => 'paid']);
         $invoice->refresh();
+
+        #record transaction
+        $transaction = Transaction::create([
+            'status' => 'successful',
+            'amount' => $invoice->grand_total,
+            'user_id' => $user->id,
+            'type' => 'debit',
+            'balance_before' => $balance_before,
+            'balance_after' => $user->refresh()->amount,
+        ]);
     }
 
     public function process(Cart $cart, User $user)
@@ -109,7 +123,7 @@ class CashierService
         $this->processInvoice($invoice);
 
         PurchaseCompleted::dispatch($invoice);
-
+        
         return $invoice;
     }
 }

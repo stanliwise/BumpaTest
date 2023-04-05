@@ -25,7 +25,7 @@ class PurchaseCompleted
      *
      * @return void
      */
-    public function __construct($invoice)
+    public function __construct(Invoice $invoice)
     {
         $this->invoice = $invoice;
     }

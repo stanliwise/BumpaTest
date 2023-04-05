@@ -6,7 +6,7 @@ use App\Events\BadgeUnlocked;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class ProcessBadgeUnlocked
+class ProcessBadgeUnlocked implements ShouldQueue
 {
     /**
      * Create the event listener.
@@ -26,6 +26,6 @@ class ProcessBadgeUnlocked
      */
     public function handle(BadgeUnlocked $event)
     {
-        //
+    
     }
 }
