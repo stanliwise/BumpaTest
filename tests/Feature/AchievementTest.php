@@ -16,10 +16,11 @@ class AchievementTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $seed = true;
+
     public function setUp(): void
     {
         parent::setUp();
-        $this->seed();
     }
 
     /**
@@ -56,20 +57,23 @@ class AchievementTest extends TestCase
                 'current_badge',
                 'next_badge',
                 'remaining_to_unlock_next_badge'
-            ])->dump();
+            ])->assertJson(
+                [
+                    'current_badge' => "Beginner",
+                    'remaining_to_unlock_next_badge' => 3
+                ]
+            );
 
 
     }
 
-    public function achievement_route_show_valid_info_about_user_with_a_badge(){
+    public function test_achievement_route_show_valid_info_about_user_with_a_badge(){
         $user = User::factory()->create();
-
-        $user->achievements()->syncWithoutDetaching(Achievement::first());
 
         $this
         ->get(route('achievement.info', ['user' => $user->id]))
         ->assertJson([
-            'next_badge' => Badge::skip(1)->first()->name
+            'next_badge' => 'Beginner'
         ]);
     }
 }
