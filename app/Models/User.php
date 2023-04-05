@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function current_achievement()
     {
-        return $this->achievements()->orderByPivot('created_at', 'desc')->limit(1);
+        return $this->achievements()->orderBy('achievements.purchase_count', 'desc')->limit(1);
     }
 
     public function invoices()

@@ -40,7 +40,7 @@ class AwardBadge implements ShouldQueue
     public function handle(AchievementUnlocked $event)
     {
         $nextBadge = $event->user->next_badge();
-
+        
         if ($event->user->achievements()->count() >= $nextBadge->achievement_count) {
             $event->user->badges()->syncWithoutDetaching($nextBadge);
             BadgeUnlocked::dispatch($nextBadge->name, $event->user);

@@ -34,9 +34,14 @@ class AchievementTest extends TestCase
             'amount' => 15000
         ]);
 
+        $product = Product::factory()->create([
+            'quantity' => 6,
+            'price' => 500,
+        ]);
+
         $cart = new Cart();
 
-        $cart->add(Product::first(), 6);
+        $cart->add($product, 6);
 
         $cashier = new CashierService();
 
