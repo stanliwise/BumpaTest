@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class AchievementTest extends TestCase
+class AchievementBadgeTest extends TestCase
 {
     use RefreshDatabase;
 
